@@ -10,8 +10,12 @@ class OpDispatch:
     def execute(self, op_code, operand_a, operand_b):
         if op_code in self.op_table:
             self.op_table[op_code](operand_a, operand_b)
+            num_operands = (op_code & 0b11000000) >> 6
+            sets_pc = (op_code & 0b00010000) >> 4
+            if not sets_pc:
+                self.cpu.pc += num_operands + 1
         else:
-            raise Exception("Unsupported operation")
+            raise Exception(f"Unsupported operation: {op_code}")
 
 
 class ALUOpDispatch(OpDispatch):
@@ -58,7 +62,6 @@ class ALUOpDispatch(OpDispatch):
 
     def MUL(self, a, b):
         self.cpu.reg[a] = self.cpu.reg[a] * self.cpu.reg[b]
-        self.cpu.pc += 3
 
     def NOT(self, a, b):
         pass
@@ -144,7 +147,6 @@ class CPUOpDispatch(OpDispatch):
 
     def LDI(self, a, b):
         self.cpu.reg[a] = b
-        self.cpu.pc += 3
 
     def NOP(self, a, b):
         pass
@@ -157,7 +159,6 @@ class CPUOpDispatch(OpDispatch):
 
     def PRN(self, a, b):
         print(self.cpu.reg[a])
-        self.cpu.pc += 2
 
     def PUSH(self, a, b):
         pass
@@ -220,7 +221,7 @@ class CPU:
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
-        self.alu_op_dispatch.execute(op, reg_a, reg_b)
+        pass
 
     def trace(self):
         """
@@ -249,8 +250,8 @@ class CPU:
             IR = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
-            alu_op = IR & 0b00100000
+            alu_op = (IR & 0b00100000) >> 5
             if alu_op:
-                self.alu(IR, operand_a, operand_b)
+                self.alu_op_dispatch.execute(IR, operand_a, operand_b)
             else:
                 self.cpu_op_dispatch.execute(IR, operand_a, operand_b)

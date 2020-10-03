@@ -6,6 +6,7 @@ import sys
 class OpDispatch:
     def __init__(self, cpu):
         self.cpu = cpu
+        self.reg = cpu.reg
 
     def execute(self, op_code, operand_a, operand_b):
         if op_code in self.op_table:
@@ -61,7 +62,7 @@ class ALUOpDispatch(OpDispatch):
         pass
 
     def MUL(self, a, b):
-        self.cpu.reg[a] = self.cpu.reg[a] * self.cpu.reg[b]
+        self.reg[a] = (self.reg[a] * self.reg[b]) & 0xFF
 
     def NOT(self, a, b):
         pass
@@ -146,22 +147,26 @@ class CPUOpDispatch(OpDispatch):
         pass
 
     def LDI(self, a, b):
-        self.cpu.reg[a] = b
+        self.reg[a] = b
 
     def NOP(self, a, b):
         pass
 
     def POP(self, a, b):
-        pass
+        self.reg[a] = self.cpu.ram_read(self.reg[7])
+        self.reg[7] += 1
 
     def PRA(self, a, b):
         pass
 
     def PRN(self, a, b):
-        print(self.cpu.reg[a])
+        print(self.reg[a])
 
     def PUSH(self, a, b):
-        pass
+        self.reg[7] -= 1
+        sp = self.reg[7]
+        val = self.reg[a]
+        self.cpu.ram_write(sp, val)
 
     def RET(self, a, b):
         pass

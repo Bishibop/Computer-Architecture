@@ -3,7 +3,11 @@
 
 import sys
 from cpu import *
-program_file_name = sys.argv[1]
+try:
+    program_file_name = sys.argv[1]
+except IndexError as e:
+    print("Missing program file name")
+    sys.exit(1)
 
 cpu = CPU()
 

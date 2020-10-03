@@ -3,6 +3,172 @@
 import sys
 
 
+class OpDispatch:
+    def __init__(self, cpu):
+        self.cpu = cpu
+
+    def execute(self, op_code, operand_a, operand_b):
+        if op_code in self.op_table:
+            self.op_table[op_code](operand_a, operand_b)
+        else:
+            print("Unrecognized OP code. Exiting...")
+            sys.exit(1)
+
+
+class ALUOpDispatch(OpDispatch):
+    def __init__(self, cpu):
+        super().__init__(cpu)
+
+        self.op_table = {
+            0b10100000: self.ADD,
+            0b10101000: self.AND,
+            0b10100111: self.CMP,
+            0b01100110: self.DEC,
+            0b10100011: self.DIV,
+            0b01100101: self.INC,
+            0b10100100: self.MOD,
+            0b10100010: self.MUL,
+            0b01101001: self.NOT,
+            0b10101010: self.OR,
+            0b10101100: self.SHL,
+            0b10101101: self.SHR,
+            0b10100001: self.SUB,
+            0b10101011: self.XOR
+        }
+
+    def ADD(self, a, b):
+        pass
+
+    def AND(self, a, b):
+        pass
+
+    def CMP(self, a, b):
+        pass
+
+    def DEC(self, a, b):
+        pass
+
+    def DIV(self, a, b):
+        pass
+
+    def INC(self, a, b):
+        pass
+
+    def MOD(self, a, b):
+        pass
+
+    def MUL(self, a, b):
+        pass
+
+    def NOT(self, a, b):
+        pass
+
+    def OR(self, a, b):
+        pass
+
+    def SHL(self, a, b):
+        pass
+
+    def SHR(self, a, b):
+        pass
+
+    def SUB(self, a, b):
+        pass
+
+    def XOR(self, a, b):
+        pass
+
+
+class CPUOpDispatch(OpDispatch):
+    def __init__(self, cpu):
+        super().__init__(cpu)
+
+        self.op_table = {
+            0b01010000: self.CALL,
+            0b00000001: self.HLT,
+            0b01010010: self.INT,
+            0b00010011: self.IRET,
+            0b01010101: self.JEQ,
+            0b01011010: self.JGE,
+            0b01010111: self.JGT,
+            0b01011001: self.JLE,
+            0b01011000: self.JLT,
+            0b01010100: self.JMP,
+            0b01010110: self.JNE,
+            0b10000011: self.LD,
+            0b10000010: self.LDI,
+            0b00000000: self.NOP,
+            0b01000110: self.POP,
+            0b01001000: self.PRA,
+            0b01000111: self.PRN,
+            0b01000101: self.PUSH,
+            0b00010001: self.RET,
+            0b10000100: self.ST
+        }
+
+    def CALL(self, a, b):
+        pass
+
+    def HLT(self, a, b):
+        self.cpu.stop()
+
+    def INT(self, a, b):
+        pass
+
+    def IRET(self, a, b):
+        pass
+
+    def JEQ(self, a, b):
+        pass
+
+    def JGE(self, a, b):
+        pass
+
+    def JGT(self, a, b):
+        pass
+
+    def JLE(self, a, b):
+        pass
+
+    def JLT(self, a, b):
+        pass
+
+    def JMP(self, a, b):
+        pass
+
+    def JNE(self, a, b):
+        pass
+
+    def LD(self, a, b):
+        pass
+
+    def LDI(self, a, b):
+        self.cpu.reg[a] = b
+        self.cpu.pc += 3
+
+    def NOP(self, a, b):
+        pass
+
+    def POP(self, a, b):
+        pass
+
+    def PRA(self, a, b):
+        pass
+
+    def PRN(self, a, b):
+        print(self.cpu.reg[a])
+        self.cpu.pc += 2
+
+    def PUSH(self, a, b):
+        pass
+
+    def RET(self, a, b):
+        pass
+
+    def ST(self, a, b):
+        pass
+
+
 class CPU:
     """Main CPU class."""
     def __init__(self):
@@ -17,42 +183,13 @@ class CPU:
         #  self.MAR = 0
         #  self.MDR = 0
         self.fl = 0b00000000
-        self.ops = {
-            0b10100000: "ADD",
-            0b10101000: "AND",
-            0b01010000: "CALL",
-            0b10100111: "CMP",
-            0b01100110: "DEC",
-            0b10100011: "DIV",
-            0b00000001: "HLT",
-            0b01100101: "INC",
-            0b01010010: "INT",
-            0b00010011: "IRET",
-            0b01010101: "JEQ",
-            0b01011010: "JGE",
-            0b01010111: "JGT",
-            0b01011001: "JLE",
-            0b01011000: "JLT",
-            0b01010100: "JMP",
-            0b01010110: "JNE",
-            0b10000011: "LD",
-            0b10000010: "LDI",
-            0b10100100: "MOD",
-            0b10100010: "MUL",
-            0b00000000: "NOP",
-            0b01101001: "NOT",
-            0b10101010: "OR",
-            0b01000110: "POP",
-            0b01001000: "PRA",
-            0b01000111: "PRN",
-            0b01000101: "PUSH",
-            0b00010001: "RET",
-            0b10101100: "SHL",
-            0b10101101: "SHR",
-            0b10000100: "ST",
-            0b10100001: "SUB",
-            0b10101011: "XOR",
-        }
+        self.running = True
+        self.cpu_op_dispatch = CPUOpDispatch(self)
+        self.alu_op_dispatch = ALUOpDispatch(self)
+        self.op_table = {}
+
+    def stop(self):
+        self.running = False
 
     def ram_read(self, MAR):
         return self.ram[MAR]
@@ -60,22 +197,22 @@ class CPU:
     def ram_write(self, MAR, MDR):
         self.ram[MAR] = MDR
 
-    def load(self):
+    def load(self, program_file_name):
         """Load a program into memory."""
 
         address = 0
 
-        # For now, we've just hardcoded a program:
+        program = []
 
-        program = [
-            # From print8.ls8
-            0b10000010,  # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111,  # PRN R0
-            0b00000000,
-            0b00000001,  # HLT
-        ]
+        with open(program_file_name) as f:
+            lines = f.readlines()
+            for line in lines:
+                clean_line = line.split('#')[0].strip()
+                if clean_line:
+                    program.append(int(clean_line, 2))
+                else:
+                    # blank line or comment
+                    pass
 
         for instruction in program:
             self.ram[address] = instruction
@@ -113,22 +250,8 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        running = True
-        while running:
+        while self.running:
             IR = self.ram_read(self.pc)
-            command = self.ops[IR]
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
-
-            if command == "HLT":
-                running = False
-            elif command == "LDI":
-                self.reg[operand_a] = operand_b
-                self.pc += 3
-            elif command == "PRN":
-                print(self.reg[operand_a])
-                self.pc += 2
-            else:
-                # Is this actually what I'm supposed to do on an uncognized OP?
-                print("Unrecognized OP code. Exiting...")
-                sys.exit(1)
+            self.cpu_op_dispatch.execute(IR, operand_a, operand_b)

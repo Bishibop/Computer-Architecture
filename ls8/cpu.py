@@ -11,8 +11,7 @@ class OpDispatch:
         if op_code in self.op_table:
             self.op_table[op_code](operand_a, operand_b)
         else:
-            print("Unrecognized OP code. Exiting...")
-            sys.exit(1)
+            raise Exception("Unsupported operation")
 
 
 class ALUOpDispatch(OpDispatch):
@@ -58,7 +57,8 @@ class ALUOpDispatch(OpDispatch):
         pass
 
     def MUL(self, a, b):
-        pass
+        self.cpu.reg[a] = self.cpu.reg[a] * self.cpu.reg[b]
+        self.cpu.pc += 3
 
     def NOT(self, a, b):
         pass
@@ -220,12 +220,7 @@ class CPU:
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
-
-        if op == "ADD":
-            self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
-        else:
-            raise Exception("Unsupported ALU operation")
+        self.alu_op_dispatch.execute(op, reg_a, reg_b)
 
     def trace(self):
         """
@@ -254,4 +249,8 @@ class CPU:
             IR = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
-            self.cpu_op_dispatch.execute(IR, operand_a, operand_b)
+            alu_op = IR & 0b00100000
+            if alu_op:
+                self.alu(IR, operand_a, operand_b)
+            else:
+                self.cpu_op_dispatch.execute(IR, operand_a, operand_b)

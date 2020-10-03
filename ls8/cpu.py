@@ -41,7 +41,7 @@ class ALUOpDispatch(OpDispatch):
         }
 
     def ADD(self, a, b):
-        pass
+        self.reg[a] = (self.reg[a] + self.reg[b]) & 0xFF
 
     def AND(self, a, b):
         pass
@@ -110,9 +110,6 @@ class CPUOpDispatch(OpDispatch):
             0b10000100: self.ST
         }
 
-    def CALL(self, a, b):
-        pass
-
     def HLT(self, a, b):
         self.cpu.stop()
 
@@ -168,8 +165,22 @@ class CPUOpDispatch(OpDispatch):
         val = self.reg[a]
         self.cpu.ram_write(sp, val)
 
+    def CALL(self, a, b):
+        subroutine_pc = self.reg[a]
+        print('calling: ', a, subroutine_pc, self.cpu.pc + 2)
+        self.reg[a] = self.cpu.pc + 2
+        print('return_pc in call: ', self.reg[a])
+        self.PUSH(a, b)
+        self.reg[a] = subroutine_pc
+        self.cpu.pc = subroutine_pc
+
     def RET(self, a, b):
-        pass
+        reg_0_original_val = self.reg[0]
+        self.POP(0, b)
+        return_pc = self.reg[0]
+        self.reg[0] = reg_0_original_val
+        print('return_pc in ret: ', return_pc)
+        self.cpu.pc = return_pc
 
     def ST(self, a, b):
         pass

@@ -25,62 +25,62 @@ class ALUOpDispatch(OpDispatch):
 
         self.op_table = {
             0b10100000: self.ADD,
-            0b10101000: self.AND,
-            0b10100111: self.CMP,
-            0b01100110: self.DEC,
-            0b10100011: self.DIV,
-            0b01100101: self.INC,
-            0b10100100: self.MOD,
+            #  0b10101000: self.AND,
+            #  0b10100111: self.CMP,
+            #  0b01100110: self.DEC,
+            #  0b10100011: self.DIV,
+            #  0b01100101: self.INC,
+            #  0b10100100: self.MOD,
             0b10100010: self.MUL,
-            0b01101001: self.NOT,
-            0b10101010: self.OR,
-            0b10101100: self.SHL,
-            0b10101101: self.SHR,
-            0b10100001: self.SUB,
-            0b10101011: self.XOR
+            #  0b01101001: self.NOT,
+            #  0b10101010: self.OR,
+            #  0b10101100: self.SHL,
+            #  0b10101101: self.SHR,
+            #  0b10100001: self.SUB,
+            #  0b10101011: self.XOR
         }
 
     def ADD(self, a, b):
         self.reg[a] = (self.reg[a] + self.reg[b]) & 0xFF
 
-    def AND(self, a, b):
-        pass
-
-    def CMP(self, a, b):
-        pass
-
-    def DEC(self, a, b):
-        pass
-
-    def DIV(self, a, b):
-        pass
-
-    def INC(self, a, b):
-        pass
-
-    def MOD(self, a, b):
-        pass
+    #  def AND(self, a, b):
+    #      pass
+    #
+    #  def CMP(self, a, b):
+    #      pass
+    #
+    #  def DEC(self, a, b):
+    #      pass
+    #
+    #  def DIV(self, a, b):
+    #      pass
+    #
+    #  def INC(self, a, b):
+    #      pass
+    #
+    #  def MOD(self, a, b):
+    #      pass
 
     def MUL(self, a, b):
         self.reg[a] = (self.reg[a] * self.reg[b]) & 0xFF
 
-    def NOT(self, a, b):
-        pass
-
-    def OR(self, a, b):
-        pass
-
-    def SHL(self, a, b):
-        pass
-
-    def SHR(self, a, b):
-        pass
-
-    def SUB(self, a, b):
-        pass
-
-    def XOR(self, a, b):
-        pass
+    #  def NOT(self, a, b):
+    #      pass
+    #
+    #  def OR(self, a, b):
+    #      pass
+    #
+    #  def SHL(self, a, b):
+    #      pass
+    #
+    #  def SHR(self, a, b):
+    #      pass
+    #
+    #  def SUB(self, a, b):
+    #      pass
+    #
+    #  def XOR(self, a, b):
+    #      pass
 
 
 class CPUOpDispatch(OpDispatch):
@@ -90,20 +90,20 @@ class CPUOpDispatch(OpDispatch):
         self.op_table = {
             0b01010000: self.CALL,
             0b00000001: self.HLT,
-            0b01010010: self.INT,
-            0b00010011: self.IRET,
-            0b01010101: self.JEQ,
-            0b01011010: self.JGE,
-            0b01010111: self.JGT,
-            0b01011001: self.JLE,
-            0b01011000: self.JLT,
-            0b01010100: self.JMP,
-            0b01010110: self.JNE,
-            0b10000011: self.LD,
+            #  0b01010010: self.INT,
+            #  0b00010011: self.IRET,
+            #  0b01010101: self.JEQ,
+            #  0b01011010: self.JGE,
+            #  0b01010111: self.JGT,
+            #  0b01011001: self.JLE,
+            #  0b01011000: self.JLT,
+            #  0b01010100: self.JMP,
+            #  0b01010110: self.JNE,
+            #  0b10000011: self.LD,
             0b10000010: self.LDI,
-            0b00000000: self.NOP,
+            #  0b00000000: self.NOP,
             0b01000110: self.POP,
-            0b01001000: self.PRA,
+            #  0b01001000: self.PRA,
             0b01000111: self.PRN,
             0b01000101: self.PUSH,
             0b00010001: self.RET,
@@ -113,48 +113,48 @@ class CPUOpDispatch(OpDispatch):
     def HLT(self, a, b):
         self.cpu.stop()
 
-    def INT(self, a, b):
-        pass
-
-    def IRET(self, a, b):
-        pass
-
-    def JEQ(self, a, b):
-        pass
-
-    def JGE(self, a, b):
-        pass
-
-    def JGT(self, a, b):
-        pass
-
-    def JLE(self, a, b):
-        pass
-
-    def JLT(self, a, b):
-        pass
-
-    def JMP(self, a, b):
-        pass
-
-    def JNE(self, a, b):
-        pass
-
-    def LD(self, a, b):
-        pass
+    #  def INT(self, a, b):
+    #      pass
+    #
+    #  def IRET(self, a, b):
+    #      pass
+    #
+    #  def JEQ(self, a, b):
+    #      pass
+    #
+    #  def JGE(self, a, b):
+    #      pass
+    #
+    #  def JGT(self, a, b):
+    #      pass
+    #
+    #  def JLE(self, a, b):
+    #      pass
+    #
+    #  def JLT(self, a, b):
+    #      pass
+    #
+    #  def JMP(self, a, b):
+    #      pass
+    #
+    #  def JNE(self, a, b):
+    #      pass
+    #
+    #  def LD(self, a, b):
+    #      pass
 
     def LDI(self, a, b):
         self.reg[a] = b
 
-    def NOP(self, a, b):
-        pass
+    #  def NOP(self, a, b):
+    #      pass
 
     def POP(self, a, b):
         self.reg[a] = self.cpu.ram_read(self.reg[7])
         self.reg[7] += 1
 
-    def PRA(self, a, b):
-        pass
+    #  def PRA(self, a, b):
+    #      pass
 
     def PRN(self, a, b):
         print(self.reg[a])
@@ -167,9 +167,7 @@ class CPUOpDispatch(OpDispatch):
 
     def CALL(self, a, b):
         subroutine_pc = self.reg[a]
-        print('calling: ', a, subroutine_pc, self.cpu.pc + 2)
         self.reg[a] = self.cpu.pc + 2
-        print('return_pc in call: ', self.reg[a])
         self.PUSH(a, b)
         self.reg[a] = subroutine_pc
         self.cpu.pc = subroutine_pc
@@ -179,11 +177,12 @@ class CPUOpDispatch(OpDispatch):
         self.POP(0, b)
         return_pc = self.reg[0]
         self.reg[0] = reg_0_original_val
-        print('return_pc in ret: ', return_pc)
         self.cpu.pc = return_pc
 
     def ST(self, a, b):
-        pass
+        val = self.reg[b]
+        address = self.reg[a]
+        self.cpu.ram_write(address, val)
 
 
 class CPU:
@@ -194,11 +193,6 @@ class CPU:
         self.reg = [0] * 8
         self.reg[7] = 0xF4
         self.pc = 0
-        # Local variable in #run
-        #  self.IR = 0
-        # Readme says I don't need these.
-        #  self.MAR = 0
-        #  self.MDR = 0
         self.fl = 0b00000000
         self.running = True
         self.cpu_op_dispatch = CPUOpDispatch(self)
@@ -232,7 +226,7 @@ class CPU:
                     pass
 
         for instruction in program:
-            self.ram[address] = instruction
+            self.ram_write(address, instruction)
             address += 1
 
     def alu(self, op, reg_a, reg_b):

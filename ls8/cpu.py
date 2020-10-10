@@ -26,26 +26,30 @@ class ALUOpDispatch(OpDispatch):
 
         self.op_table = {
             0b10100000: self.ADD,
-            #  0b10101000: self.AND,
+            0b10100110: self.ADDI,
+            0b10101000: self.AND,
             0b10100111: self.CMP,
             #  0b01100110: self.DEC,
             #  0b10100011: self.DIV,
             #  0b01100101: self.INC,
-            #  0b10100100: self.MOD,
+            0b10100100: self.MOD,
             0b10100010: self.MUL,
-            #  0b01101001: self.NOT,
-            #  0b10101010: self.OR,
-            #  0b10101100: self.SHL,
-            #  0b10101101: self.SHR,
+            0b01101001: self.NOT,
+            0b10101010: self.OR,
+            0b10101100: self.SHL,
+            0b10101101: self.SHR,
             #  0b10100001: self.SUB,
-            #  0b10101011: self.XOR
+            0b10101011: self.XOR
         }
 
     def ADD(self, a, b):
         self.reg[a] = (self.reg[a] + self.reg[b]) & 0xFF
 
-    #  def AND(self, a, b):
-    #      pass
+    def ADDI(self, a, b):
+        self.reg[a] = (self.reg[a] + b) & 0xFF
+
+    def AND(self, a, b):
+        self.reg[a] = (self.reg[a] & self.reg[b]) & 0xFF
 
     def CMP(self, a, b):
         valA = self.reg[a]
@@ -65,30 +69,33 @@ class ALUOpDispatch(OpDispatch):
     #
     #  def INC(self, a, b):
     #      pass
-    #
-    #  def MOD(self, a, b):
-    #      pass
+
+    def MOD(self, a, b):
+        if self.reg[b]:
+            self.reg[a] = (self.reg[a] % self.reg[b]) & 0xFF
+        else:
+            raise Exception("Divide by zero error")
 
     def MUL(self, a, b):
         self.reg[a] = (self.reg[a] * self.reg[b]) & 0xFF
 
-    #  def NOT(self, a, b):
-    #      pass
-    #
-    #  def OR(self, a, b):
-    #      pass
-    #
-    #  def SHL(self, a, b):
-    #      pass
-    #
-    #  def SHR(self, a, b):
-    #      pass
-    #
+    def NOT(self, a, b):
+        self.reg[a] = (~self.reg[a]) & 0xFF
+
+    def OR(self, a, b):
+        self.reg[a] = (self.reg[a] | self.reg[b]) & 0xFF
+
+    def SHL(self, a, b):
+        self.reg[a] = (self.reg[a] * (2**self.reg[b])) & 0xFF
+
+    def SHR(self, a, b):
+        self.reg[a] = (self.reg[a] / (2**self.reg[b])) & 0xFF
+
     #  def SUB(self, a, b):
     #      pass
-    #
-    #  def XOR(self, a, b):
-    #      pass
+
+    def XOR(self, a, b):
+        self.reg[a] = (self.reg[a] ^ self.reg[b]) & 0xFF
 
 
 class CPUOpDispatch(OpDispatch):

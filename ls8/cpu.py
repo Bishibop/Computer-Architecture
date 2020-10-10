@@ -1,6 +1,7 @@
 """CPU functionality."""
 
 import sys
+from datetime import datetime
 
 
 class OpDispatch:
@@ -16,7 +17,7 @@ class OpDispatch:
             if not sets_pc:
                 self.cpu.pc += num_operands + 1
         else:
-            raise Exception(f"Unsupported operation: {op_code}")
+            raise Exception("Unsupported operation: " + "{0:b}".format(IR))
 
 
 class ALUOpDispatch(OpDispatch):
@@ -26,7 +27,7 @@ class ALUOpDispatch(OpDispatch):
         self.op_table = {
             0b10100000: self.ADD,
             #  0b10101000: self.AND,
-            #  0b10100111: self.CMP,
+            0b10100111: self.CMP,
             #  0b01100110: self.DEC,
             #  0b10100011: self.DIV,
             #  0b01100101: self.INC,
@@ -45,10 +46,17 @@ class ALUOpDispatch(OpDispatch):
 
     #  def AND(self, a, b):
     #      pass
-    #
-    #  def CMP(self, a, b):
-    #      pass
-    #
+
+    def CMP(self, a, b):
+        valA = self.reg[a]
+        valB = self.reg[b]
+        if valA > valB:
+            self.cpu.fl = 0b00000010
+        elif valA < valB:
+            self.cpu.fl = 0b00000100
+        else:
+            self.cpu.fl = 0b00000001
+
     #  def DEC(self, a, b):
     #      pass
     #
@@ -92,13 +100,13 @@ class CPUOpDispatch(OpDispatch):
             0b00000001: self.HLT,
             #  0b01010010: self.INT,
             #  0b00010011: self.IRET,
-            #  0b01010101: self.JEQ,
+            0b01010101: self.JEQ,
             #  0b01011010: self.JGE,
             #  0b01010111: self.JGT,
             #  0b01011001: self.JLE,
             #  0b01011000: self.JLT,
-            #  0b01010100: self.JMP,
-            #  0b01010110: self.JNE,
+            0b01010100: self.JMP,
+            0b01010110: self.JNE,
             #  0b10000011: self.LD,
             0b10000010: self.LDI,
             #  0b00000000: self.NOP,
@@ -118,10 +126,13 @@ class CPUOpDispatch(OpDispatch):
     #
     #  def IRET(self, a, b):
     #      pass
-    #
-    #  def JEQ(self, a, b):
-    #      pass
-    #
+
+    def JEQ(self, a, b):
+        if self.cpu.fl & 0b00000001:
+            self.JMP(a, b)
+        else:
+            self.cpu.pc += 2
+
     #  def JGE(self, a, b):
     #      pass
     #
@@ -133,13 +144,16 @@ class CPUOpDispatch(OpDispatch):
     #
     #  def JLT(self, a, b):
     #      pass
-    #
-    #  def JMP(self, a, b):
-    #      pass
-    #
-    #  def JNE(self, a, b):
-    #      pass
-    #
+
+    def JMP(self, a, b):
+        self.cpu.pc = self.reg[a]
+
+    def JNE(self, a, b):
+        if not self.cpu.fl & 0b00000001:
+            self.JMP(a, b)
+        else:
+            self.cpu.pc += 2
+
     #  def LD(self, a, b):
     #      pass
 
@@ -198,6 +212,9 @@ class CPU:
         self.cpu_op_dispatch = CPUOpDispatch(self)
         self.alu_op_dispatch = ALUOpDispatch(self)
         self.op_table = {}
+        #  self.interrupted = False
+        #  self.initialization_time = datetime.now()
+        #  self.seconds_timer = 0
 
     def stop(self):
         self.running = False
@@ -254,12 +271,19 @@ class CPU:
 
         print()
 
+    def bits(n):
+        while n:
+            b = n & (~n + 1)
+            yield b
+            n ^= b
+
     def run(self):
         """Run the CPU."""
         while self.running:
             IR = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
+            #  print(self.pc, "{0:b}".format(self.fl), "{0:b}".format(IR))
             alu_op = (IR & 0b00100000) >> 5
             if alu_op:
                 self.alu_op_dispatch.execute(IR, operand_a, operand_b)
